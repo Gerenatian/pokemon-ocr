@@ -2,8 +2,9 @@ C:\workspaces\pokemon-ocr\pokemon-ocr\bin\Debug\pokemon-ocr.exe.config
 C:\workspaces\pokemon-ocr\pokemon-ocr\bin\Debug\pokemon-ocr.exe
 C:\workspaces\pokemon-ocr\pokemon-ocr\bin\Debug\pokemon-ocr.pdb
 C:\workspaces\pokemon-ocr\pokemon-ocr\bin\Debug\IronOcr.dll
+C:\workspaces\pokemon-ocr\pokemon-ocr\bin\Debug\Newtonsoft.Json.dll
 C:\workspaces\pokemon-ocr\pokemon-ocr\bin\Debug\IronOcr.xml
-C:\workspaces\pokemon-ocr\pokemon-ocr\obj\Debug\pokemon-ocr.csprojAssemblyReference.cache
+C:\workspaces\pokemon-ocr\pokemon-ocr\bin\Debug\Newtonsoft.Json.xml
 C:\workspaces\pokemon-ocr\pokemon-ocr\obj\Debug\pokemon-ocr.csproj.CoreCompileInputs.cache
 C:\workspaces\pokemon-ocr\pokemon-ocr\obj\Debug\pokemon-ocr.csproj.CopyComplete
 C:\workspaces\pokemon-ocr\pokemon-ocr\obj\Debug\pokemon-ocr.exe
