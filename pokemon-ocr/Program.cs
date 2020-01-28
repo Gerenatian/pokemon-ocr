@@ -31,35 +31,9 @@ namespace pokemon_ocr
 
             var searchId = CaptureCard();
 
+            searchId = string.Format("{0}-{1}", set, searchId);
+
             Card card = new Card();
-
-            //var Ocr = new AdvancedOcr()
-            //{
-            //    CleanBackgroundNoise = true,
-            //    EnhanceContrast = true,
-            //    EnhanceResolution = true,
-            //    Language = IronOcr.Languages.English.OcrLanguagePack,
-            //    Strategy = IronOcr.AdvancedOcr.OcrStrategy.Advanced,
-            //    ColorSpace = AdvancedOcr.OcrColorSpace.Color,
-            //    //DetectWhiteTextOnDarkBackgrounds = true,
-            //    InputImageType = AdvancedOcr.InputTypes.Document,
-            //    RotateAndStraighten = true,
-            //    //ReadBarCodes = true,
-            //    ColorDepth = 4
-            //};
-
-            ////var Ocr = new IronOcr.AutoOcr();
-            //var Result = Ocr.Read(@"C:\workspaces\pokemon-ocr\pokemon-ocr\tests\captureAttempt.jpg");
-            //Console.WriteLine(Result.Text);
-
-            //Regex myRegex = new Regex(strRegex);
-            //Match myMatch = myRegex.Match(Result.Text);
-
-            //if (String.IsNullOrEmpty(myMatch.ToString().Split('/')[0]))
-            //{
-            //    continue;
-            //}
-            //string searchId = set + "-" + myMatch.ToString().Split('/')[0];
 
             using (WebResponse response = WebRequest.Create("https://api.pokemontcg.io/v1/cards/" + searchId).GetResponse())
             {
@@ -83,18 +57,16 @@ namespace pokemon_ocr
         {
             bool cardRecognized = false;
             string id = string.Empty;
-            VideoCapture capture = new VideoCapture(); //create a camera capture
+            VideoCapture capture = new VideoCapture();
             capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Autofocus, 1);
             capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Fps, 30);
-            //capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameHeight, 240);
-            //capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameWidth, 320);
 
             while (!cardRecognized)
             {
 
 
-                Thread.Sleep(2000); // give the camera time to focus
-                Bitmap image = capture.QueryFrame().Bitmap; //take a picture
+                Thread.Sleep(2000);
+                Bitmap image = capture.QueryFrame().Bitmap;
 
                 saveJpg(image);
                 var Ocr = new AdvancedOcr()
@@ -108,7 +80,6 @@ namespace pokemon_ocr
                     DetectWhiteTextOnDarkBackgrounds = false,
                     InputImageType = AdvancedOcr.InputTypes.Snippet,
                     RotateAndStraighten = true,
-                    //ReadBarCodes = true,
                     ColorDepth = 0
                 };
 
@@ -128,7 +99,6 @@ namespace pokemon_ocr
             }
 
             return id;
-            //
         }
 
         public static async void InsertCardAsync(Card card)
