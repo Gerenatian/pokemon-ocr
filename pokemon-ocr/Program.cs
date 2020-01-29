@@ -19,6 +19,7 @@ namespace pokemon_ocr
 {
     class Program
     {
+        public static bool moreCards = true;
         public static string strRegex = @"[0-9]+\/([0-9]+)";
         public static string set = "sm12";
         private static readonly HttpClient client = new HttpClient();
@@ -28,29 +29,70 @@ namespace pokemon_ocr
 
         static void Main(string[] args)
         {
+            Console.Write("Start an opening? ");
+            var shouldOpen = Console.ReadLine();
+            var startOpening = shouldOpen.ToLower() == "y" ? true : false;
 
-            var searchId = CaptureCard();
-
-            searchId = string.Format("{0}-{1}", set, searchId);
-
-            Card card = new Card();
-
-            using (WebResponse response = WebRequest.Create("https://api.pokemontcg.io/v1/cards/" + searchId).GetResponse())
+            if (startOpening)
             {
-                using (StreamReader sr = new StreamReader(response.GetResponseStream()))
+                Opening opening = new Opening();
+                opening.userId = "Gerenatian";
+                opening.cost = 0;
+                opening.isDevelopment = true;
+
+                while (moreCards)
                 {
-                    var cardJson = sr.ReadToEnd();
+                    var searchId = CaptureCard();
 
-                    var cards = JsonConvert.DeserializeObject<Cards>(cardJson);
+                    searchId = string.Format("{0}-{1}", set, searchId);
 
-                    card = cards.card;
+                    Card card = new Card();
 
-                    InsertCardAsync(card);
+                    using (WebResponse response = WebRequest.Create("https://api.pokemontcg.io/v1/cards/" + searchId).GetResponse())
+                    {
+                        using (StreamReader sr = new StreamReader(response.GetResponseStream()))
+                        {
+                            var cardJson = sr.ReadToEnd();
+
+                            var cards = JsonConvert.DeserializeObject<Cards>(cardJson);
+
+                            card = cards.card;
+
+                            InsertCardAsync(card);
+
+                            opening.cardIds += card.id + ",";
+                        }
+                    }
+
+                    Console.Write("Another Card in Pack? ");
+                    var input = Console.ReadLine();
+
+                    moreCards = input.ToLower() == "y" ? true : false;
                 }
+
+                AddOpening(opening);
+            }
+        }
+
+        private static void AddOpening(Opening opening)
+        {
+            WebRequest request = WebRequest.Create(RestBase + @"/Opening");
+            request.Method = "POST";
+            request.ContentType = "application/json";
+
+            using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+            {
+                opening.cardIds = opening.cardIds.TrimEnd(',');
+                string json = JsonConvert.SerializeObject(opening);
+
+                streamWriter.Write(json);
             }
 
-
-            Console.Write("yo");
+            var httpResponse = (HttpWebResponse)request.GetResponse();
+            using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
+            {
+                var result = streamReader.ReadToEnd();
+            }
         }
 
         private static string CaptureCard()
@@ -63,8 +105,6 @@ namespace pokemon_ocr
 
             while (!cardRecognized)
             {
-
-
                 Thread.Sleep(2000);
                 Bitmap image = capture.QueryFrame().Bitmap;
 

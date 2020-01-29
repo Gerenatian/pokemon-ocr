@@ -63,6 +63,7 @@
   <ItemGroup>
     <Compile Include="Models\Card.cs" />
     <Compile Include="Models\Cards.cs" />
+    <Compile Include="Models\Opening.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
