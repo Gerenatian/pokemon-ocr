@@ -12,5 +12,7 @@ namespace pokemon_ocr.Models
         public string cardIds { get; set; }
         public decimal cost { get; set; }
         public bool isDevelopment { get; set; }
+        public string setid { get; set; }
+        public string setname { get; set; }
     }
 }

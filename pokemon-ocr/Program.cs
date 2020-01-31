@@ -33,6 +33,9 @@ namespace pokemon_ocr
             var shouldOpen = Console.ReadLine();
             var startOpening = shouldOpen.ToLower() == "y" ? true : false;
 
+            Console.Write("What set are we opening? ");
+            set = Console.ReadLine();
+
             if (startOpening)
             {
                 Opening opening = new Opening();
@@ -48,20 +51,29 @@ namespace pokemon_ocr
 
                     Card card = new Card();
 
-                    using (WebResponse response = WebRequest.Create("https://api.pokemontcg.io/v1/cards/" + searchId).GetResponse())
+                    try
                     {
-                        using (StreamReader sr = new StreamReader(response.GetResponseStream()))
+                        using (WebResponse response = WebRequest.Create("https://api.pokemontcg.io/v1/cards/" + searchId).GetResponse())
                         {
-                            var cardJson = sr.ReadToEnd();
+                            using (StreamReader sr = new StreamReader(response.GetResponseStream()))
+                            {
+                                var cardJson = sr.ReadToEnd();
 
-                            var cards = JsonConvert.DeserializeObject<Cards>(cardJson);
+                                var cards = JsonConvert.DeserializeObject<Cards>(cardJson);
 
-                            card = cards.card;
+                                card = cards.card;
 
-                            InsertCardAsync(card);
+                                InsertCardAsync(card);
 
-                            opening.cardIds += card.id + ",";
+                                opening.cardIds += card.id + ",";
+                                opening.setname = card.set;
+                                opening.setid = card.setCode;
+                            }
                         }
+                    }
+                    catch
+                    {
+                        continue;
                     }
 
                     Console.Write("Another Card in Pack? ");
@@ -99,42 +111,49 @@ namespace pokemon_ocr
         {
             bool cardRecognized = false;
             string id = string.Empty;
-            VideoCapture capture = new VideoCapture();
-            capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Autofocus, 1);
-            capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Fps, 30);
+            int attempts = 0;
+            //VideoCapture capture = new VideoCapture();
+            //capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Autofocus, 1);
+            //capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Fps, 30);
 
             while (!cardRecognized)
             {
-                Thread.Sleep(2000);
-                Bitmap image = capture.QueryFrame().Bitmap;
-
-                saveJpg(image);
-                var Ocr = new AdvancedOcr()
-                {
-                    CleanBackgroundNoise = true,
-                    EnhanceContrast = true,
-                    EnhanceResolution = true,
-                    Language = IronOcr.Languages.English.OcrLanguagePack,
-                    Strategy = IronOcr.AdvancedOcr.OcrStrategy.Fast,
-                    ColorSpace = AdvancedOcr.OcrColorSpace.Color,
-                    DetectWhiteTextOnDarkBackgrounds = false,
-                    InputImageType = AdvancedOcr.InputTypes.Snippet,
-                    RotateAndStraighten = true,
-                    ColorDepth = 0
-                };
-
-                var Result = Ocr.Read(image);
-                Console.WriteLine(Result.Text);
-
-                Regex myRegex = new Regex(strRegex);
-                Match myMatch = myRegex.Match(Result.Text);
-
-                Console.WriteLine(Result.Text);
-                if (String.IsNullOrEmpty(myMatch.ToString().Split('/')[0]))
-                {
-                    continue;
+                //if (attempts > 5) {
+                if (true) {
+                    Console.Write("Could not determine card. Manually enter the series # ");
+                    return Console.ReadLine();
                 }
-                id = myMatch.ToString().Split('/')[0];
+                //Thread.Sleep(2000);
+                //Bitmap image = capture.QueryFrame().Bitmap;
+
+                //saveJpg(image);
+                //var Ocr = new AdvancedOcr()
+                //{
+                //    CleanBackgroundNoise = true,
+                //    EnhanceContrast = true,
+                //    EnhanceResolution = true,
+                //    Language = IronOcr.Languages.English.OcrLanguagePack,
+                //    Strategy = IronOcr.AdvancedOcr.OcrStrategy.Fast,
+                //    ColorSpace = AdvancedOcr.OcrColorSpace.Color,
+                //    DetectWhiteTextOnDarkBackgrounds = false,
+                //    InputImageType = AdvancedOcr.InputTypes.Snippet,
+                //    RotateAndStraighten = true,
+                //    ColorDepth = 0
+                //};
+
+                //var Result = Ocr.Read(image);
+                //Console.WriteLine(Result.Text);
+
+                //Regex myRegex = new Regex(strRegex);
+                //Match myMatch = myRegex.Match(Result.Text);
+
+                //Console.WriteLine(Result.Text);
+                //if (String.IsNullOrEmpty(myMatch.ToString().Split('/')[0]))
+                //{
+                //    attempts++;
+                //    continue;
+                //}
+                //id = myMatch.ToString().Split('/')[0];
                 break;
             }
 
